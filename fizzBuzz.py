@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
 def fizzBuzz(limit):
   for num in range(1,limit+1):
