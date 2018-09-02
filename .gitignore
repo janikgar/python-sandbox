@@ -1,4 +1,4 @@
-./.vscode
+.vscode/
 
 credentials*.json
 oauth2.json
