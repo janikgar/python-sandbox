@@ -23,20 +23,21 @@ def parse_google_auth(file):
   This function requires a JSON file for a specific Google OAuth user.
   This can be received from the Google Cloud Console for the linked project.
   '''
-  saved_token = open('token.bin', 'wb+')
-  print(saved_token.read())
-  if len(saved_token.read()) == 0:
+
+  try:
+    saved_token = open('token.bin', 'rb')
+    creds = pickle.load(saved_token)
+  except:
+    saved_token = open('token.bin', 'wb+')
     auth_flow = flow.InstalledAppFlow.from_client_secrets_file(file, scopes=SCOPES)
     creds = auth_flow.run_local_server(open_browser=True)
     pickle.dump(creds, saved_token)
+  finally:
+    service = build('sheets', 'v4', credentials=creds)
     saved_token.close()
-  else:
-    # pass
-    creds = pickle.load(saved_token)
-    # saved_token.
-    saved_token.close()
-
-  print(creds)
-  service = build('sheets', 'v4', credentials=creds)
+      
+  request = service.spreadsheets().values().get(spreadsheetId=SPREADSHEET_ID, range="Transactions")
+  response = request.execute()
+  pprint(response)
 
 parse_google_auth(AUTH_FILE)
