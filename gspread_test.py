@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 
-import gspread
+# import gspread
 from pprint import pprint
 from pydoc import help
 import pickle
+import json
 
 from google_auth_oauthlib import flow
 from apiclient.discovery import build
@@ -14,6 +15,7 @@ AUTH_FILE = 'oauth2.json'
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
 SPREADSHEET_ID = '1wbnG31Z5QBm2fuyzZOY9XkSij0EERtX92wEHq9LbPiI'
 URL = 'https://sheets.googleapis.com/v4/spreadsheets/' + SPREADSHEET_ID
+SHEET_NAMES = ["Transactions", "Categories", "Balance History"]
 
 def parse_google_auth(file):
   '''
@@ -33,11 +35,18 @@ def parse_google_auth(file):
     creds = auth_flow.run_local_server(open_browser=True)
     pickle.dump(creds, saved_token)
   finally:
-    service = build('sheets', 'v4', credentials=creds)
     saved_token.close()
-      
-  request = service.spreadsheets().values().get(spreadsheetId=SPREADSHEET_ID, range="Transactions")
-  response = request.execute()
-  pprint(response)
 
-parse_google_auth(AUTH_FILE)
+  service = build('sheets', 'v4', credentials=creds)
+  return service
+
+def open_file(service, file_id, range_string):
+  request = service.spreadsheets().values().batchGet(spreadsheetId=SPREADSHEET_ID, ranges=range_string)
+  response = request.execute()
+  savefile = open('{}.json'.format(range_string.lower()), 'w+')
+  json.dump(response, savefile, indent=4, separators=[',', ': '])
+
+SERVICE = parse_google_auth(AUTH_FILE)
+
+for range_string in SHEET_NAMES:
+  open_file(SERVICE, SPREADSHEET_ID, range_string)
