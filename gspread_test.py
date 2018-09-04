@@ -3,23 +3,17 @@
 import gspread
 from pprint import pprint
 from pydoc import help
-import json
+import pickle
 
 from google_auth_oauthlib import flow
-
-from google.auth import credentials
-from oauthlib.oauth2 import BackendApplicationClient
-import requests_oauthlib
-import requests
-# from google.oauth2 import service_account
-# from oauth2client.service_account import ServiceAccountCredentials
-# import oauth2client
-# oauth2client.
+from apiclient.discovery import build
+# from google.oauth2 import credentials.credentials.credentials.Credentials.
 
 
 AUTH_FILE = 'oauth2.json'
-SCOPES = ["https://www.googleapis.com/auth/spreadsheets"]
+SCOPES = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
 SPREADSHEET_ID = '1wbnG31Z5QBm2fuyzZOY9XkSij0EERtX92wEHq9LbPiI'
+URL = 'https://sheets.googleapis.com/v4/spreadsheets/' + SPREADSHEET_ID
 
 def parse_google_auth(file):
   '''
@@ -29,20 +23,20 @@ def parse_google_auth(file):
   This function requires a JSON file for a specific Google OAuth user.
   This can be received from the Google Cloud Console for the linked project.
   '''
-  auth_flow = flow.Flow.from_client_secrets_file(file, scopes=SCOPES)
-  auth_flow.redirect_uri = 'http://localhost'
-  auth_url, state = auth_flow.authorization_url(access_type='offline', include_granted_scopes='true')
-  print(auth_url)
+  saved_token = open('token.bin', 'wb+')
+  print(saved_token.read())
+  if len(saved_token.read()) == 0:
+    auth_flow = flow.InstalledAppFlow.from_client_secrets_file(file, scopes=SCOPES)
+    creds = auth_flow.run_local_server(open_browser=True)
+    pickle.dump(creds, saved_token)
+    saved_token.close()
+  else:
+    # pass
+    creds = pickle.load(saved_token)
+    # saved_token.
+    saved_token.close()
+
+  print(creds)
+  service = build('sheets', 'v4', credentials=creds)
 
 parse_google_auth(AUTH_FILE)
-# pprint(help(BackendApplicationClient))
-
-# creds = credentials.Credentials.
-# creds = service_account.Credentials.from_service_account_file('credentials.json', scopes=SCOPES)
-# creds = ServiceAccountCredentials.from_json_keyfile_name('oauth2.json', SCOPES)
-# gc = gspread.authorize(creds)
-
-# sheet = gc.open_by_key('1wbnG31Z5QBm2fuyzZOY9XkSij0EERtX92wEHq9LbPiI')
-# pprint(sheet.worksheets)
-
-# print(sheet)
