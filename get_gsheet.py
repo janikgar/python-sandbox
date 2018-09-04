@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-# import gspread
 from pprint import pprint
 from pydoc import help
 import pickle
@@ -8,8 +7,6 @@ import json
 
 from google_auth_oauthlib import flow
 from apiclient.discovery import build
-# from google.oauth2 import credentials.credentials.credentials.Credentials.
-
 
 AUTH_FILE = 'oauth2.json'
 SCOPES = ["https://www.googleapis.com/auth/spreadsheets.readonly"]
@@ -18,13 +15,13 @@ URL = 'https://sheets.googleapis.com/v4/spreadsheets/' + SPREADSHEET_ID
 SHEET_NAMES = ["Transactions", "Categories", "Balance History"]
 
 def parse_google_auth(file):
-  '''
+  """
   parse_goole_auth(file)
   :param: file is a String with a path (relative or absolute) to the given JSON file.
 
   This function requires a JSON file for a specific Google OAuth user.
   This can be received from the Google Cloud Console for the linked project.
-  '''
+  """
 
   try:
     saved_token = open('token.bin', 'rb')

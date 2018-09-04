@@ -1,10 +1,18 @@
 #!/usr/bin/env python3
 
-from http.server import HTTPServer, SimpleHTTPRequestHandler
+from flask import Flask, render_template
+from flask_bootstrap import Bootstrap
+import json
 
-def run(server_class=HTTPServer, handler_class=SimpleHTTPRequestHandler):
-    server_address = ('', 8000)
-    httpd = server_class(server_address, handler_class)
-    httpd.serve_forever()
+app = Flask(__name__)
+Bootstrap(app)
 
-run()
+@app.route('/tables')
+
+def tables():
+    table_file = json.load(open('transactions.json', 'r'))
+    table = table_file['valueRanges'][0]['values']
+    return render_template('tables.html', table=table)
+
+if __name__=='__main__':
+    app.run()
